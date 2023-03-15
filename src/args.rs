@@ -1,5 +1,5 @@
 use {
-    std::path::Path,
+    std::{io::Read, path::Path},
     user_error::{UserFacingError, UFE},
 };
 
@@ -57,8 +57,12 @@ impl Args
     fn load(input: &str) -> Result<Vec<u8>, std::io::Error>
     {
         let path = Path::new(input);
-        let _file = std::fs::File::open(path)?;
+        let mut file = std::fs::File::open(path)?;
+        let metadata = std::fs::metadata(path)?;
 
-        Ok(vec![])
+        let mut buffer = vec![0; metadata.len() as usize];
+        file.read_exact(&mut buffer)?;
+
+        Ok(buffer)
     }
 }
