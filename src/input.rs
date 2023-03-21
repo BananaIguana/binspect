@@ -5,14 +5,16 @@ use {
 
 #[allow(unused_variables)]
 #[allow(dead_code)]
-pub struct Args
+pub struct Input
 {
     file: String,
     data: Vec<u8>,
 }
 
-impl Args
+impl Input
 {
+    /// Create an `Input` object. This function parses the program arguments and loads the
+    /// specified file.
     pub fn new() -> Self
     {
         let args: Vec<String> = std::env::args().collect();
@@ -41,7 +43,7 @@ impl Args
 
         if let Ok(data) = Self::load(&file)
         {
-            Args { file, data }
+            Input { file, data }
         }
         else
         {
@@ -54,6 +56,7 @@ impl Args
         }
     }
 
+    /// Loads a file from disk to an array.
     fn load(input: &str) -> Result<Vec<u8>, std::io::Error>
     {
         let path = Path::new(input);

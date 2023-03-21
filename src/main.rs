@@ -1,11 +1,19 @@
-use crate::args::Args;
+use crate::{input::Input, view::View};
 
-mod args;
+mod input;
+mod view;
 
 #[quit::main]
-fn main()
+fn main() -> Result<(), std::io::Error>
 {
-    Args::new();
+    Input::new();
 
-    println!("Hello, world!");
+    let mut view = View::new();
+
+    while !view.poll_event()
+    {
+        view.redraw()?;
+    }
+
+    Ok(())
 }
