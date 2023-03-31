@@ -5,14 +5,17 @@ use {
 
 #[allow(unused_variables)]
 #[allow(dead_code)]
-pub struct Args
+pub struct Input
 {
     file: String,
     data: Vec<u8>,
+    hex_data: String,
 }
 
-impl Args
+impl Input
 {
+    /// Create an `Input` object. This function parses the program arguments and loads the
+    /// specified file.
     pub fn new() -> Self
     {
         let args: Vec<String> = std::env::args().collect();
@@ -41,7 +44,9 @@ impl Args
 
         if let Ok(data) = Self::load(&file)
         {
-            Args { file, data }
+            let hex_data = Self::build_hex_data(&data);
+
+            Input { file, data, hex_data }
         }
         else
         {
@@ -54,6 +59,7 @@ impl Args
         }
     }
 
+    /// Loads a file from disk to an array.
     fn load(input: &str) -> Result<Vec<u8>, std::io::Error>
     {
         let path = Path::new(input);
@@ -64,5 +70,28 @@ impl Args
         file.read_exact(&mut buffer)?;
 
         Ok(buffer)
+    }
+
+    pub fn filename(&self) -> &str
+    {
+        self.file.as_str()
+    }
+
+    #[allow(dead_code)]
+    pub fn data(&self) -> &[u8]
+    {
+        &self.data
+    }
+
+    pub fn hex_data(&self) -> &str
+    {
+        &self.hex_data
+    }
+
+    fn build_hex_data(data: &[u8]) -> String
+    {
+        data.iter().fold(String::new(), |string, byte| {
+            string + format!("{:02X} ", byte).as_str()
+        })
     }
 }
