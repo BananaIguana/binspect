@@ -68,4 +68,15 @@ impl Input
 
         Ok(buffer)
     }
+
+    pub fn filename(&self) -> &str
+    {
+        self.file.as_str()
+    }
+
+    #[allow(dead_code)]
+    pub fn data(&self) -> &[u8]
+    {
+        &self.data
+    }
 }

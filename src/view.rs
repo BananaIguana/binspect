@@ -1,36 +1,40 @@
 use {
+    crate::{
+        input::Input,
+        utils::{Edges, RectUtils},
+    },
     crossterm::{
         event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
         execute,
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     },
-    std::io::Stdout,
-    tui::{
-        backend::CrosstermBackend,
-        layout::Alignment,
-        style::{Color, Style},
-        text::Spans,
-        widgets::{Block, Borders, Paragraph, Wrap},
-        Terminal,
-    },
+    std::{cell::RefCell, io::Stdout, rc::Rc},
+    tui::{backend::CrosstermBackend, Terminal},
 };
+
+mod data_view;
+mod footer;
+mod header;
 
 /// Console view rendering structure.
 pub struct View
 {
-    terminal: Terminal<CrosstermBackend<Stdout>>,
+    terminal: Rc<RefCell<Terminal<CrosstermBackend<Stdout>>>>,
     redraw_count: u32,
+    input: Input,
 }
 
 impl View
 {
     /// Create a `View` object.
-    pub fn new() -> Self
+    pub fn from_input(input: Input) -> Self
     {
         let terminal = Self::create().expect("Failed to create terminal backend.");
+        let terminal = Rc::new(RefCell::new(terminal));
 
         let mut ret = Self {
             terminal,
+            input,
             redraw_count: 0,
         };
 
@@ -71,24 +75,20 @@ impl View
     {
         self.redraw_count += 1;
 
-        let spans = vec![
-            Spans::from(format!("Redraw count = {}", self.redraw_count)),
-            Spans::from("Press 'Q' to quit."),
-        ];
+        let header = self.draw_header();
+        let data_view = self.draw_data_view();
+        let footer = self.draw_footer();
 
-        let paragraph = Paragraph::new(spans)
-            .block(
-                Block::default()
-                    .title("Placeholder Frame")
-                    .borders(Borders::ALL),
-            )
-            .style(Style::default().fg(Color::White).bg(Color::Black))
-            .alignment(Alignment::Left)
-            .wrap(Wrap { trim: true });
+        let mut terminal = self.terminal.borrow_mut();
 
-        self.terminal.draw(|f| {
-            let size = f.size();
-            f.render_widget(paragraph, size);
+        terminal.draw(|f| {
+            let border = f.size().inset(1, Edges::TOP | Edges::BOTTOM);
+            let top = View::header_rect(f.size());
+            let bottom = View::footer_rect(f.size());
+
+            f.render_widget(header, top);
+            f.render_widget(data_view, border);
+            f.render_widget(footer, bottom);
         })?;
 
         Ok(())
@@ -101,12 +101,12 @@ impl View
         disable_raw_mode()?;
 
         execute!(
-            self.terminal.backend_mut(),
+            self.terminal.borrow_mut().backend_mut(),
             LeaveAlternateScreen,
             DisableMouseCapture
         )?;
 
-        self.terminal.show_cursor()?;
+        self.terminal.borrow_mut().show_cursor()?;
 
         Ok(())
     }
