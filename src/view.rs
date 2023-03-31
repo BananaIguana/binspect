@@ -75,19 +75,19 @@ impl View
     {
         self.redraw_count += 1;
 
-        let header = self.draw_header();
-        let data_view = self.draw_data_view();
-        let footer = self.draw_footer();
-
         let mut terminal = self.terminal.borrow_mut();
 
         terminal.draw(|f| {
-            let border = f.size().inset(1, Edges::TOP | Edges::BOTTOM);
+            let data_view_rect = f.size().inset(1, Edges::TOP | Edges::BOTTOM);
             let top = View::header_rect(f.size());
             let bottom = View::footer_rect(f.size());
 
+            let header = self.draw_header();
+            let data_view = self.draw_data_view(data_view_rect.area() as usize);
+            let footer = self.draw_footer();
+
             f.render_widget(header, top);
-            f.render_widget(data_view, border);
+            f.render_widget(data_view, data_view_rect);
             f.render_widget(footer, bottom);
         })?;
 

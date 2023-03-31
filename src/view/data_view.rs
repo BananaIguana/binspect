@@ -1,17 +1,32 @@
 use {
     crate::view::View,
     tui::{
-        style::Style,
-        widgets::{Block, Borders},
+        style::{Color, Style},
+        text::Spans,
+        widgets::{Block, Borders, Paragraph, Wrap},
     },
 };
 
 impl View
 {
-    pub fn draw_data_view(&self) -> Block
+    pub fn draw_data_view(&self, area: usize) -> Paragraph
     {
-        Block::default()
-            .borders(Borders::all())
-            .border_style(Style::default())
+        let hex_data = self.input.hex_data();
+
+        let slice = &hex_data[0..area];
+
+        let spans = Spans::from(slice);
+
+        let paragraph = Paragraph::new(spans)
+            .style(Style::default().fg(Color::Gray).bg(Color::Black))
+            .block(
+                Block::default()
+                    .borders(Borders::all())
+                    .border_style(Style::default().fg(Color::DarkGray).bg(Color::Black))
+                    .style(Style::default().bg(Color::Black)),
+            )
+            .wrap(Wrap { trim: false });
+
+        paragraph
     }
 }

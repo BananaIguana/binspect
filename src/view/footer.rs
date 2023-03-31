@@ -22,13 +22,22 @@ impl View
 
     pub fn draw_footer(&self) -> Paragraph
     {
-        let spans = Spans::from(vec![Span::styled(
-            "'Q' = Quit'",
-            Style::default().fg(Color::DarkGray),
-        )]);
+        let spans = Spans::from(vec![
+            Span::styled("'", Style::default().fg(Color::Cyan)),
+            Span::styled("Q", Style::default().fg(Color::LightCyan)),
+            Span::styled("' = ", Style::default().fg(Color::Cyan)),
+            Span::styled("Quit", Style::default().fg(Color::LightCyan)),
+        ]);
+
+        // Q' = Quit
 
         let paragraph = Paragraph::new(spans)
-            .style(Style::default().fg(Color::White).bg(Color::Black))
+            .style(
+                Style::default()
+                    .fg(Color::White)
+                    .bg(Color::Black)
+                    .bg(Color::Blue),
+            )
             .alignment(Alignment::Left)
             .wrap(Wrap { trim: true });
 

@@ -9,6 +9,7 @@ pub struct Input
 {
     file: String,
     data: Vec<u8>,
+    hex_data: String,
 }
 
 impl Input
@@ -43,7 +44,9 @@ impl Input
 
         if let Ok(data) = Self::load(&file)
         {
-            Input { file, data }
+            let hex_data = Self::build_hex_data(&data);
+
+            Input { file, data, hex_data }
         }
         else
         {
@@ -78,5 +81,17 @@ impl Input
     pub fn data(&self) -> &[u8]
     {
         &self.data
+    }
+
+    pub fn hex_data(&self) -> &str
+    {
+        &self.hex_data
+    }
+
+    fn build_hex_data(data: &[u8]) -> String
+    {
+        data.iter().fold(String::new(), |string, byte| {
+            string + format!("{:02X} ", byte).as_str()
+        })
     }
 }
