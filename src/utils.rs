@@ -6,7 +6,7 @@ bitflags! {
         const LEFT      = 0b00000001;
         const RIGHT     = 0b00000010;
         const TOP       = 0b00000100;
-        const BOTTOM       = 0b00001000;
+        const BOTTOM    = 0b00001000;
     }
 }
 

@@ -1,5 +1,6 @@
 use {
     crate::view::View,
+    std::cmp::min,
     tui::{
         style::{Color, Style},
         text::Spans,
@@ -13,7 +14,7 @@ impl View
     {
         let hex_data = self.input.hex_data();
 
-        let slice = &hex_data[0..area];
+        let slice = &hex_data[0..min(hex_data.len(), area)];
 
         let spans = Spans::from(slice);
 

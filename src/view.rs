@@ -8,7 +8,7 @@ use {
         execute,
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     },
-    std::{cell::RefCell, io::Stdout, rc::Rc},
+    std::{cell::RefCell, io::Stdout},
     tui::{backend::CrosstermBackend, Terminal},
 };
 
@@ -19,7 +19,7 @@ mod header;
 /// Console view rendering structure.
 pub struct View
 {
-    terminal: Rc<RefCell<Terminal<CrosstermBackend<Stdout>>>>,
+    terminal: RefCell<Terminal<CrosstermBackend<Stdout>>>,
     redraw_count: u32,
     input: Input,
 }
@@ -30,7 +30,7 @@ impl View
     pub fn from_input(input: Input) -> Self
     {
         let terminal = Self::create().expect("Failed to create terminal backend.");
-        let terminal = Rc::new(RefCell::new(terminal));
+        let terminal = RefCell::new(terminal);
 
         let mut ret = Self {
             terminal,
